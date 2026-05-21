@@ -17,11 +17,13 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Build core first so dependent packages can resolve its types.
+      - run: pnpm --filter @chadlabs/core build
       - run: pnpm -r typecheck
       - run: pnpm -r test
       - name: Network locality smoke (claim c6)
         run: pnpm --filter @chadlabs/bookkeeping smoke:network
-      - name: Build packages
+      - name: Build everything
         run: pnpm -r build
       - name: Verify published tarball excludes eval/ and providers/
         run: |
