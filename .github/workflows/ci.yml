@@ -21,16 +21,24 @@ jobs:
       - run: pnpm --filter @chadlabs/core build
       - run: pnpm -r typecheck
       - run: pnpm -r test
-      - name: Network locality smoke (claim c6)
+      - name: Network locality smoke — bookkeeping (claim c6)
         run: pnpm --filter @chadlabs/bookkeeping smoke:network
+      - name: Network locality smoke — prior-auth (claim c6)
+        run: pnpm --filter @chadlabs/prior-auth smoke:network
+      - name: Network locality smoke — commission-recon (claim c6)
+        run: pnpm --filter @chadlabs/commission-recon smoke:network
       - name: Build everything
         run: pnpm -r build
-      - name: Verify published tarball excludes eval/ and providers/
+      - name: Verify all published tarballs exclude tests / eval / providers / specs / scripts
         run: |
-          cd packages/bookkeeping
-          pnpm pack
-          if tar -tzf chadlabs-bookkeeping-*.tgz | grep -E '(^|/)eval/|providers/' ; then
-            echo "FAIL: eval/ or providers/ leaked into the publishable tarball"
-            exit 1
-          fi
-          echo "OK: tarball excludes eval/ and providers/"
+          for pkg in bookkeeping prior-auth commission-recon; do
+            cd packages/$pkg
+            pnpm pack
+            if tar -tzf chadlabs-$pkg-*.tgz | grep -E '(^|/)(eval|providers|specs|scripts|__tests__|__fixtures__)/|\.test\.|vitest' ; then
+              echo "FAIL: $pkg tarball leaked dev artifacts"
+              exit 1
+            fi
+            echo "OK: $pkg tarball clean"
+            rm chadlabs-$pkg-*.tgz
+            cd ../..
+          done
