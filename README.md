@@ -11,10 +11,12 @@ Cursor, Codex, Continue + Ollama, LM Studio…). No marketplace markup on tokens
 | Package | Status | Description |
 |---|---|---|
 | [`@chadlabs/core`](packages/core/README.md) | v0.1, alpha | Shared MCP framework: `defineMCPServer(Tools, Prompts, Resources)`, license gate, marketplace adapters, SQLite migration runner |
-| [`@chadlabs/bookkeeping`](packages/bookkeeping/README.md) | v0.1, pre-launch | 3 Tools + 3 Prompts + 1 Resource for solo bookkeepers. invoice_extract / txn_classify / chase_draft. Cross-host eval: 90/100/100/80% on invoice fields, 100% on txn classification (OpenRouter claude-sonnet-4.5, 10 + 20 fixtures). |
-| `@chadlabs/legal-intake` | planned | PI intake triage: extract → conflict-check → SOL math. Targets Claude-using attorneys. |
-| `@chadlabs/n8n-handoff` | planned | Workflow → client portal generator for n8n consultants. |
-| `@chadlabs/dispute-packet` | planned | Order data → Etsy/Amazon dispute evidence PDF. |
+| [`@chadlabs/bookkeeping`](packages/bookkeeping/README.md) | v0.2 in-tree | 6 Tools + 4 Prompts + 1 Resource for solo bookkeepers. invoice_extract / txn_classify / chase_draft + multi-client cockpit (client_register / client_summary / month_end_status / monthend_narrative). Cross-host eval: 90/100/100/80% on invoice fields, 100% on txn classification. |
+| [`@chadlabs/prior-auth`](packages/prior-auth/README.md) | v0.1 scaffolded | 3 Tools + 2 Prompts + 1 Resource for healthcare denial appeals. sla_clock_check / denial_reason_extract / appeal_log_record + appeal_letter_draft / denial_classify. 22 canonical CMS-0057-F reason codes. Targets specialty practices, small clinics, billing VAs. |
+| [`@chadlabs/commission-recon`](packages/commission-recon/README.md) | v0.1 scaffolded | 1 Tool + 1 Prompt + 1 Resource (skeleton) for independent insurance brokers. discrepancy_log_record + dispute_email_draft + 10-carrier format-hint resource. Sibling audience to bookkeeping. |
+| `@chadlabs/legal-intake` | **skip** (window closed 2026-04) | Harvey, Tavrn, Vector, Wayco, General Legal all shipped legal MCPs in last 6 weeks. |
+| `@chadlabs/n8n-handoff` | **skip** | r/n8n pain is distribution not handoff. |
+| `@chadlabs/dispute-packet` | **skip** | Etsy chargeback fee eats the ROI. |
 
 ## Layout
 

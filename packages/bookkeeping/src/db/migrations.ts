@@ -65,6 +65,48 @@ export const migrations: Migration[] = [
     `,
   },
   {
+    version: 6,
+    name: "create_clients",
+    sql: `
+      -- Multi-client cockpit: one row per bookkeeping client / business entity
+      -- the bookkeeper is managing inside this MCP. normalized_slug is the
+      -- UNIQUE key for upserts. qbo_realm_id and xero_tenant_id are optional
+      -- pointers to the host system; we never call those systems ourselves.
+      CREATE TABLE IF NOT EXISTS clients (
+        id               TEXT PRIMARY KEY,
+        normalized_slug  TEXT NOT NULL UNIQUE,
+        display_name     TEXT NOT NULL,
+        status           TEXT NOT NULL DEFAULT 'active',
+        qbo_realm_id     TEXT,
+        xero_tenant_id   TEXT,
+        notes            TEXT,
+        created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+        archived_at      TEXT
+      );
+    `,
+  },
+  {
+    version: 7,
+    name: "create_month_end_checklist",
+    sql: `
+      -- Per-client, per-period month-end checklist. period is YYYY-MM.
+      -- One row per (client_id, period, item_key); item_key is from a small
+      -- canonical list maintained in src/cockpit/checklist.ts so the host LLM
+      -- can suggest the same items consistently.
+      CREATE TABLE IF NOT EXISTS month_end_checklist (
+        id          TEXT PRIMARY KEY,
+        client_id   TEXT NOT NULL REFERENCES clients(id),
+        period      TEXT NOT NULL,
+        item_key    TEXT NOT NULL,
+        item_label  TEXT NOT NULL,
+        checked     INTEGER NOT NULL DEFAULT 0,
+        checked_at  TEXT,
+        notes       TEXT,
+        UNIQUE (client_id, period, item_key)
+      );
+    `,
+  },
+  {
     version: 5,
     name: "seed_categories",
     sql: `

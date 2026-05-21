@@ -20,7 +20,9 @@ Parked ideas. Promote to a package when previous vertical proves out and bandwid
 
 | # | Idea | Source | Status |
 |---|---|---|---|
-| 0 | `@chadlabs/bookkeeping` — QBO escape MCP | Reddit scan 2026-05-21 | **shipping (v1)** |
+| 0 | `@chadlabs/bookkeeping` — QBO escape MCP | Reddit scan 2026-04-23 | **v0.2 in-tree** (added multi-client cockpit: 3 new tools, 1 new prompt, 18 cockpit tests) |
+| 0a | `@chadlabs/prior-auth` — healthcare denial appeals MCP | Phase-4 research 2026-05-21 | **v0.1 scaffolded** (3 tools, 2 prompts, 1 resource, 22 reason codes, 18 tests, network smoke green) |
+| 0b | `@chadlabs/commission-recon` — insurance broker commission recon | Phase-4 research 2026-05-21 | **v0.1 scaffolded** (1 tool, 1 prompt, 1 resource, 10 carriers, 14 tests, network smoke green) |
 
 ## Queued (Phase 2 — after bookkeeping ships)
 

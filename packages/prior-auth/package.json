@@ -1,0 +1,68 @@
+{
+  "name": "@chadlabs/prior-auth",
+  "version": "0.1.0",
+  "description": "MCP server for prior-auth denial appeals. Extracts denial reason codes, tracks appeals, checks CMS SLA deadlines, drafts appeal letters. Bring-your-own-LLM — runs inside Claude Desktop, Goose, Cursor, Codex, or any MCP host. Zero outbound LLM calls from the server.",
+  "license": "MIT",
+  "author": "Chad Simon <chad@chadacus.dev> (https://chadacus.dev)",
+  "homepage": "https://prior-auth.chadacus.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Chaddacus/chadlabs-mcp.git",
+    "directory": "packages/prior-auth"
+  },
+  "bugs": "https://github.com/Chaddacus/chadlabs-mcp/issues",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "claude-desktop",
+    "goose",
+    "prior-auth",
+    "prior-authorization",
+    "denial-appeal",
+    "healthcare",
+    "medical-billing",
+    "cms-0057-f",
+    "appeal-letter"
+  ],
+  "type": "module",
+  "bin": {
+    "prior-auth-mcp": "./dist/bin/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "INSTALL.md",
+    "PRIVACY.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "serve": "tsx bin/cli.ts serve",
+    "doctor": "tsx bin/cli.ts doctor",
+    "eval": "tsx bin/eval.ts",
+    "smoke:network": "tsx scripts/network_smoke.ts",
+    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm smoke:network && pnpm build"
+  },
+  "dependencies": {
+    "@chadlabs/core": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "better-sqlite3": "^11.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.0",
+    "@types/node": "^20.0.0",
+    "tsx": "^4.22.3",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}
