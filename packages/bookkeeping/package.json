@@ -48,6 +48,7 @@
     "doctor": "tsx bin/cli.ts doctor",
     "eval": "tsx bin/eval.ts",
     "smoke:network": "tsx scripts/network_smoke.ts",
+    "cockpit:dogfood": "tsx bin/cockpit_dogfood.ts",
     "prepublishOnly": "pnpm typecheck && pnpm test && pnpm smoke:network && pnpm build"
   },
   "dependencies": {

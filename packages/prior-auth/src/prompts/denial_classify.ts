@@ -18,7 +18,7 @@ Return ONLY a single JSON object matching this schema, no markdown fences, no co
 }
 
 Field rules:
-- denial_reason_code: exact code from the chart (e.g. "MN-001"). Match casing verbatim.
+- denial_reason_code: exact code from the chart (e.g. "MN-001"). Copy the leftmost identifier verbatim character-by-character. Do NOT abbreviate, expand, normalize, or translate the prefix (e.g. if the chart lists "FORM-001", do not output "FRM-001"; if the chart lists "FRM-001", do not output "FORM-001"). The prefix you return must exist somewhere in the chart text.
 - denial_reason_label: the human-readable label corresponding to that code.
 - confidence: 0.0 to 1.0 — your honest read of whether the language clearly maps to this code.
 - alternative_codes: up to 3 other codes you considered but rejected, ranked by likelihood.

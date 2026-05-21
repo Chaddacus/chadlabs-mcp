@@ -1,4 +1,4 @@
-# Launch pre-merge gates — @chadlabs/bookkeeping
+# Launch pre-merge gates — @chadlabs/{bookkeeping,prior-auth,commission-recon}
 
 Items required before public launch. Most are Chad-only manual steps because they need a real browser, a real human, real money, or a real account.
 
@@ -33,6 +33,18 @@ After the host-LLM refactor, this MCP makes **zero outbound LLM calls**. The hos
 | Quality on GPT-4o | ⬜ | Chad + key | `OPENAI_API_KEY` then `pnpm eval both openai gpt-4o-2024-11-20` |
 | Quality on Llama 3.3 (Ollama) | ⬜ | Chad + local model | `OLLAMA_HOST=... pnpm eval both ollama llama3.3` — advertise local-model floor honestly |
 | Cross-host CI workflow | ✅ | code | `.github/workflows/eval.yml` runs on manual dispatch or when prompts/eval change; uploads benchmarks as artifacts |
+
+### Autonomous validation — Phase 5 (LLM-as-judge dogfood)
+
+No human beta users available, so we validate prose outputs autonomously with a stronger model as critic. Pass threshold = 24/30 (80%) on a hand-written, fixture-specific rubric.
+
+| Gate | Status | Owner | Notes |
+|---|---|---|---|
+| `prior-auth` denial_classify eval | ✅ | code | 19/19 (100%) exact match on OpenRouter / Claude Sonnet 4.5 — `packages/prior-auth/benchmarks/denial-classify-openrouter-2026-05-21.md`. Fixtures realigned to current `FORM-` taxonomy; prompt tightened to forbid prefix translation. |
+| `prior-auth` appeal_letter_draft eval | ✅ | code | 5/5 pass, mean 29.4/30 — `packages/prior-auth/benchmarks/appeal-letter-openrouter-2026-05-21.md`. 6-dimension judge (cite/specific/no-halluc/remedy/tone/schema). Self-judging bias acknowledged. |
+| `commission-recon` dispute_email_draft eval | ✅ | code | 5/5 pass, mean 29.4/30 — `packages/commission-recon/benchmarks/dispute-email-openrouter-2026-05-21.md`. 6-dimension judge (nums/no-halluc/ask/tone/prof/schema). |
+| `bookkeeping` cockpit end-to-end dogfood | ✅ | code | 4 synthetic clients + idempotent re-register + full 15-item checklist walk + roster join + monthend_narrative scored 29/30 — `packages/bookkeeping/benchmarks/cockpit-dogfood-2026-05-21.md`. Runs against isolated temp DB; safe to re-run. |
+| Cross-model executor validation | ⬜ | Chad + key | Same evals against GPT-4o and a local Llama via OpenRouter to confirm prompts aren't Anthropic-shaped. |
 
 ### Truth-layer (`~/.claude/state/product_truth/`)
 
