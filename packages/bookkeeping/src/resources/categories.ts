@@ -79,6 +79,14 @@ function renderCategoriesMarkdown(): string {
   return lines.join("\n");
 }
 
+export const CATEGORIES_MARKDOWN = renderCategoriesMarkdown();
+
+/**
+ * Flat list of valid category `name` values. The host can inject this into
+ * extract/classify prompts so the model is constrained to the exact taxonomy.
+ */
+export const CATEGORY_NAMES: ReadonlyArray<string> = CATEGORIES.map((c) => c.name);
+
 export const categoriesResource: Resource = {
   uri: "bookkeeping://categories",
   name: "Chart of accounts",

@@ -1,18 +1,54 @@
 {
   "name": "@chadlabs/bookkeeping",
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "MCP server for solo bookkeepers. Extracts invoices from email, classifies transactions, drafts client chase emails. Bring-your-own-LLM — runs inside Claude Desktop, Goose, Cursor, Codex, or any MCP host. Zero outbound LLM calls from the server.",
+  "license": "MIT",
+  "author": "Chad Simon <chad@chadacus.dev> (https://chadacus.dev)",
+  "homepage": "https://bookkeeping.chadacus.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chadsimon/chadlabs-mcp.git",
+    "directory": "packages/bookkeeping"
+  },
+  "bugs": "https://github.com/chadsimon/chadlabs-mcp/issues",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "claude-desktop",
+    "goose",
+    "bookkeeping",
+    "accounting",
+    "invoice",
+    "qbo-alternative",
+    "small-business"
+  ],
   "type": "module",
   "bin": {
     "bookkeeping-mcp": "./dist/bin/cli.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "INSTALL.md",
+    "PRIVACY.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "serve": "node ./dist/bin/serve.js",
-    "bench": "tsx bin/bench.ts --render-only"
+    "serve": "tsx bin/cli.ts serve",
+    "doctor": "tsx bin/cli.ts doctor",
+    "bench": "tsx bin/bench.ts --render-only",
+    "eval": "tsx bin/eval.ts",
+    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
     "@chadlabs/core": "workspace:*",

@@ -1,0 +1,43 @@
+# Traefik service for bookkeeping.chadacus.dev — static landing page.
+#
+# Deploy:
+#   scp -r infra/landing root@linode:/opt/sites/bookkeeping-mcp
+#   ssh root@linode "cd /opt/sites/bookkeeping-mcp && docker compose up -d"
+#
+# Assumes the existing chadacus.dev Traefik stack is already running with:
+#   - traefik network: traefik_proxy
+#   - cert resolver: cloudflare (wildcard *.chadacus.dev)
+#
+# To verify the network name on the box: `docker network ls | grep traefik`
+# Adjust the external network name below if it doesn't match.
+
+services:
+  bookkeeping-landing:
+    image: nginx:alpine
+    container_name: bookkeeping-landing
+    restart: unless-stopped
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+    networks:
+      - traefik_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik_proxy"
+
+      # https://bookkeeping.chadacus.dev
+      - "traefik.http.routers.bookkeeping.rule=Host(`bookkeeping.chadacus.dev`)"
+      - "traefik.http.routers.bookkeeping.entrypoints=websecure"
+      - "traefik.http.routers.bookkeeping.tls=true"
+      - "traefik.http.routers.bookkeeping.tls.certresolver=cloudflare"
+      - "traefik.http.services.bookkeeping.loadbalancer.server.port=80"
+
+      # http -> https redirect handled by Traefik's global redirect middleware on the box.
+      # If that doesn't exist on this Traefik install, uncomment to add a local one:
+      # - "traefik.http.routers.bookkeeping-http.rule=Host(`bookkeeping.chadacus.dev`)"
+      # - "traefik.http.routers.bookkeeping-http.entrypoints=web"
+      # - "traefik.http.routers.bookkeeping-http.middlewares=https-redirect"
+      # - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+
+networks:
+  traefik_proxy:
+    external: true

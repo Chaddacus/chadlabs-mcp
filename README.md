@@ -1,20 +1,20 @@
 # ChadLabs MCP
 
-Vertical MCP servers for solo professionals. Shared core + per-vertical packages.
+Vertical MCP servers for solo professionals. Shared `@chadlabs/core` framework + per-vertical packages.
+
+**Architectural principle:** the host LLM does the inference. Our servers ship Tools, Prompts,
+and Resources — and make zero outbound LLM calls. Bring your own model (Claude Desktop, Goose,
+Cursor, Codex, Continue + Ollama, LM Studio…). No marketplace markup on tokens.
 
 ## Packages
 
 | Package | Status | Description |
 |---|---|---|
-| `@chadlabs/core` | scaffolding | Shared MCP server framework: license gate, marketplace adapters, structured-extraction runtime, SQLite migration runner, privacy smoke-test harness |
-| `@chadlabs/bookkeeping` | scaffolding (v1 vertical) | Email→invoice extractor, transaction classifier, client-chase draft generator. Targets bookkeepers escaping QBO. |
-| `@chadlabs/legal-intake` | planned | PI intake triage: extract → conflict-check → SOL math. Targets Claude-using attorneys (PI focus). |
+| [`@chadlabs/core`](packages/core/README.md) | v0.1, alpha | Shared MCP framework: `defineMCPServer(Tools, Prompts, Resources)`, license gate, marketplace adapters, SQLite migration runner |
+| [`@chadlabs/bookkeeping`](packages/bookkeeping/README.md) | v0.1, pre-launch | 3 Tools + 3 Prompts + 1 Resource for solo bookkeepers. invoice_extract / txn_classify / chase_draft. Cross-host eval: 90/100/100/80% on invoice fields, 100% on txn classification (OpenRouter claude-sonnet-4.5, 10 + 20 fixtures). |
+| `@chadlabs/legal-intake` | planned | PI intake triage: extract → conflict-check → SOL math. Targets Claude-using attorneys. |
 | `@chadlabs/n8n-handoff` | planned | Workflow → client portal generator for n8n consultants. |
 | `@chadlabs/dispute-packet` | planned | Order data → Etsy/Amazon dispute evidence PDF. |
-
-## Branding
-
-This is Chad's personal venture, separate from CloudWarriors. No CW IP, no CW codebases referenced.
 
 ## Layout
 
@@ -23,17 +23,50 @@ chadlabs-mcp/
 ├── packages/
 │   ├── core/                   # shared framework
 │   └── bookkeeping/            # v1 vertical
-├── _research/                  # market research artifacts
-└── infra/                      # (planned) license-api, landing site
+│       ├── src/                # tools, prompts, resources, db
+│       ├── bin/                # cli.ts, eval.ts
+│       ├── eval/               # cross-host evaluation harness
+│       └── benchmarks/         # generated eval reports
+├── infra/
+│   └── landing/                # bookkeeping.chadacus.dev static site + Traefik compose
+├── _research/                  # market research artifacts (Reddit scan, marketer-agent idea)
+├── LAUNCH-PRE-MERGE-GATES.md   # what has to be true before each marketplace push
+└── LICENSE                     # MIT
 ```
 
-## Status
+## Quickstart (bookkeeping)
 
-Phase 1 swarm dispatch: 2026-05-21.
-- Core + bookkeeping building in parallel against placeholder interfaces.
-- Legal-intake + others fan out in Phase 2 after first vertical ships.
+```bash
+# install + scaffold local DB
+npx -y @chadlabs/bookkeeping init
 
-## Personal-venture context
+# print Claude Desktop / Goose config snippets
+npx -y @chadlabs/bookkeeping doctor
 
-See `~/personal-ventures/legalmcp/` for the original LegalIntake plan (now v2).
-See `_research/reddit-scan-2026-05-21.md` for the Reddit pain-point scan that prompted the bookkeeping-first pivot.
+# (optional) cross-host quality eval — uses your own API key
+ANTHROPIC_API_KEY=sk-...  pnpm --filter @chadlabs/bookkeeping eval both anthropic
+OPENROUTER_API_KEY=sk-... pnpm --filter @chadlabs/bookkeeping eval both openrouter
+OLLAMA_HOST=http://localhost:11434 pnpm --filter @chadlabs/bookkeeping eval both ollama llama3.3
+```
+
+## Why "bring your own model"
+
+- **No token markup.** Marketplaces charge for the MCP, not for inference. You pay Anthropic / OpenAI / OpenRouter (or zero, if local) directly.
+- **No vendor lock-in.** Switch hosts without re-buying the tool. The same MCP works whether you use Claude Desktop today and Goose+Ollama next quarter.
+- **Privacy by construction.** The server has no LLM API keys to leak. Your AI host already mediates that boundary; we don't duplicate it.
+- **Smaller surface.** No retry/backoff/rate-limit machinery, no model-version drift inside our package. The host owns inference; we own the data and the prompts.
+
+## Cross-host evaluation
+
+Run `pnpm --filter @chadlabs/bookkeeping eval both <provider> [model]` against any of:
+`anthropic`, `openai`, `openrouter`, `ollama`, `lmstudio`. Reports land in
+`packages/bookkeeping/benchmarks/{invoice,txn}-classify-cross-host.md` with per-field
+accuracy, latency, token counts, and a per-fixture failure breakdown.
+
+## Branding
+
+Chad's personal venture, separate from CloudWarriors. No CW IP, no CW codebases referenced.
+
+## License
+
+[MIT](LICENSE).

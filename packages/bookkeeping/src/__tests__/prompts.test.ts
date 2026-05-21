@@ -34,6 +34,23 @@ describe("invoice_extract prompt", () => {
     expect(userMsg).not.toContain("Subject:");
     expect(userMsg).toContain("body text");
   });
+
+  it("embeds categories_markdown when provided", () => {
+    const out = invoiceExtractPrompt.render({
+      email_body: "body",
+      categories_markdown: "# my categories\n- foo\n- bar",
+    });
+    const system = out.messages[0]!.content.text;
+    expect(system).toContain("# my categories");
+    expect(system).toContain("EXACTLY one of these names");
+  });
+
+  it("falls back to resource-load instruction without categories_markdown", () => {
+    const out = invoiceExtractPrompt.render({ email_body: "body" });
+    const system = out.messages[0]!.content.text;
+    expect(system).toContain('"bookkeeping://categories"');
+    expect(system).toContain('"Uncategorized"');
+  });
 });
 
 describe("txn_classify prompt", () => {
@@ -68,6 +85,16 @@ describe("txn_classify prompt", () => {
     const user = out.messages[1]!.content.text;
     expect(user).toContain("Known vendor hints");
     expect(user).toContain("OpenAI");
+  });
+
+  it("embeds categories_markdown when provided", () => {
+    const out = txnClassifyPrompt.render({
+      transactions_json: "[]",
+      categories_markdown: "# tax taxonomy\n- one\n- two",
+    });
+    const system = out.messages[0]!.content.text;
+    expect(system).toContain("# tax taxonomy");
+    expect(system).toContain("EXACTLY one of these names");
   });
 });
 

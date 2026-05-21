@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>BookkeepingMCP — bring-your-own-model bookkeeping for Claude, Goose, and Cursor</title>
+<meta name="description" content="MCP server for solo bookkeepers. Extracts invoices from email, classifies transactions, drafts client chase emails. Runs inside whichever AI host you already use. $29/mo. No QBO required." />
+<meta property="og:title" content="BookkeepingMCP — QBO escape valve, BYO model" />
+<meta property="og:description" content="MCP server for solo bookkeepers. Bring your own LLM. $29/mo." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://bookkeeping.chadacus.dev" />
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --muted: #555;
+    --bg: #fafaf7;
+    --accent: #2956a3;
+    --code-bg: #f0efe7;
+    --border: #d8d6cc;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; }
+  h1 { font-size: 2.4rem; line-height: 1.15; margin: 0 0 8px; letter-spacing: -0.01em; }
+  h2 { font-size: 1.35rem; margin: 40px 0 12px; letter-spacing: -0.005em; }
+  h3 { font-size: 1.05rem; margin: 24px 0 8px; color: var(--muted); }
+  p { margin: 0 0 12px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .lede { font-size: 1.15rem; color: var(--muted); margin: 0 0 28px; }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin: 24px 0 8px; }
+  .cta {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.98rem;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--fg);
+  }
+  .cta.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .cta:hover { text-decoration: none; opacity: 0.92; }
+  .muted-line { font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
+  pre, code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.92rem; }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    margin: 8px 0 16px;
+  }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+  pre code { background: none; padding: 0; }
+  ul { padding-left: 22px; margin: 8px 0 16px; }
+  li { margin-bottom: 4px; }
+  .hosts {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin: 12px 0 24px;
+  }
+  .host-pill {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 12px;
+    background: white;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+  .feature-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 16px 0 24px;
+  }
+  .feature {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: white;
+  }
+  .feature h3 { margin: 0 0 6px; font-size: 0.95rem; color: var(--fg); font-weight: 600; }
+  .feature p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  footer { color: var(--muted); font-size: 0.85rem; margin-top: 48px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 16px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+  th { color: var(--muted); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>BookkeepingMCP</h1>
+  <p class="lede">
+    The QBO escape valve for solo bookkeepers. Pulls structured data out of invoice emails, categorizes
+    uncategorized transactions, and drafts the chase emails you'd otherwise write by hand —
+    inside whichever AI host you already use.
+  </p>
+
+  <div class="cta-row">
+    <a class="cta primary" href="https://apify.com/chadlabs/bookkeeping-mcp">Buy on Apify · $29/mo</a>
+    <a class="cta" href="https://github.com/chadsimon/chadlabs-mcp">View on GitHub</a>
+  </div>
+  <p class="muted-line">Also listed on MCPize, Agensi, and xpay ($0.29/op).</p>
+
+  <hr />
+
+  <h2>Bring your own model</h2>
+  <p>
+    The MCP server makes <strong>zero outbound LLM calls</strong>. It exposes prompts, a small SQLite
+    vendor memory, and a chart of accounts — your AI host does the inference using your own model
+    credentials. Cross-host-verified on:
+  </p>
+  <div class="hosts">
+    <span class="host-pill">Claude Desktop</span>
+    <span class="host-pill">Goose</span>
+    <span class="host-pill">Cursor</span>
+    <span class="host-pill">Codex CLI</span>
+    <span class="host-pill">Continue + Ollama</span>
+    <span class="host-pill">LM Studio</span>
+  </div>
+  <p>
+    No marketplace markup on LLM tokens. You pay Anthropic / OpenAI / OpenRouter directly — or run
+    a local model and pay nothing per request.
+  </p>
+
+  <hr />
+
+  <h2>What it does</h2>
+  <div class="feature-row">
+    <div class="feature">
+      <h3>invoice_extract</h3>
+      <p>Paste an invoice email, get back vendor / amount / currency / line items / category — all from the chart of accounts, with confidence.</p>
+    </div>
+    <div class="feature">
+      <h3>txn_classify</h3>
+      <p>Hand it a batch of bank transactions, get one classification per row with confidence and reason. Vendor hints are honored.</p>
+    </div>
+    <div class="feature">
+      <h3>chase_draft</h3>
+      <p>Client name + list of missing receipts in, ready-to-send subject + markdown body + plain body out. Tone selectable.</p>
+    </div>
+    <div class="feature">
+      <h3>vendor_lookup / remember</h3>
+      <p>Fuzzy-matched vendor canonicalization (Jaro-Winkler ≥0.85) stored in local SQLite. Categorization stays consistent across sessions.</p>
+    </div>
+    <div class="feature">
+      <h3>chase_log_record</h3>
+      <p>Audit log of every chase email you've sent, queryable by client and transaction.</p>
+    </div>
+    <div class="feature">
+      <h3>bookkeeping://categories</h3>
+      <p>Resource with a 30-line small-business chart of accounts the prompts hand to your host LLM so categories stay consistent.</p>
+    </div>
+  </div>
+
+  <hr />
+
+  <h2>Quickstart</h2>
+  <p>You'll need Node 20+ and any MCP-capable host (Claude Desktop, Goose, etc.).</p>
+  <pre><code>npx -y @chadlabs/bookkeeping init
+npx -y @chadlabs/bookkeeping doctor</code></pre>
+  <p>
+    <code>doctor</code> prints the exact config snippet for Claude Desktop and Goose. Paste it,
+    restart the host, you're live. License key activates the full feature set.
+  </p>
+
+  <hr />
+
+  <h2>Pricing</h2>
+  <table>
+    <thead>
+      <tr><th>Marketplace</th><th>Plan</th><th>You pay</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Apify</td><td>Subscription</td><td>$29 / month</td></tr>
+      <tr><td>MCPize</td><td>Subscription</td><td>$29 / month</td></tr>
+      <tr><td>Agensi</td><td>Subscription</td><td>$29 / month</td></tr>
+      <tr><td>xpay</td><td>Usage-based</td><td>$0.29 / operation</td></tr>
+    </tbody>
+  </table>
+  <p class="muted-line">Marketplace take rates differ; the listed price is what you pay. LLM tokens (Anthropic, OpenAI, etc.) are paid separately to your provider — there's no markup.</p>
+
+  <hr />
+
+  <h2>Privacy</h2>
+  <p>
+    Invoices, transactions, and client info live in a local SQLite database at
+    <code>~/.chadlabs/bookkeeping/db.sqlite</code> on your machine. The server has no outbound
+    network calls except the optional once-per-day license validation. See the
+    <a href="https://github.com/chadsimon/chadlabs-mcp/blob/main/packages/bookkeeping/PRIVACY.md">PRIVACY.md</a>
+    in the repo for the full data-flow.
+  </p>
+
+  <hr />
+
+  <footer>
+    <p>BookkeepingMCP is part of <a href="https://chadacus.dev">ChadLabs</a> — vertical MCP servers for solo professionals. MIT-licensed core, paid license for marketplace listings.</p>
+    <p>Questions: open an issue on <a href="https://github.com/chadsimon/chadlabs-mcp">GitHub</a>.</p>
+  </footer>
+
+</main>
+</body>
+</html>

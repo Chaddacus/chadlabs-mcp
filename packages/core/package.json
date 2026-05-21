@@ -1,6 +1,22 @@
 {
   "name": "@chadlabs/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Shared MCP server framework for the ChadLabs verticals: defineMCPServer factory (Tools + Prompts + Resources), license gate, marketplace adapters, SQLite migration runner. The host LLM does inference; this core makes zero outbound LLM calls.",
+  "license": "MIT",
+  "author": "Chad Simon <chad@chadacus.dev> (https://chadacus.dev)",
+  "homepage": "https://chadacus.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chadsimon/chadlabs-mcp.git",
+    "directory": "packages/core"
+  },
+  "bugs": "https://github.com/chadsimon/chadlabs-mcp/issues",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "framework",
+    "chadlabs"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -10,13 +26,21 @@
       "import": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.30.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "better-sqlite3": "^11.0.0",
     "zod": "^3.23.0"

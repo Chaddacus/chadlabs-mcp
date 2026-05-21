@@ -2,6 +2,20 @@
 
 Parked ideas. Promote to a package when previous vertical proves out and bandwidth permits.
 
+## Architectural ground rules (apply to every vertical)
+
+- **Host-LLM principle.** The MCP server itself makes ZERO outbound LLM calls. Every vertical
+  ships Tools (deterministic, side-effecting), Prompts (rendered string + JSON-schema contract),
+  and Resources (static reference data) — the host LLM does the inference. This is the load-bearing
+  product decision: no token markup, no model lock-in, no per-vertical retry/backoff machinery.
+- **Shared core.** New verticals build on `@chadlabs/core` (license gate, marketplace adapters,
+  SQLite migrations, server factory). Anything that would otherwise be vertical-specific
+  infrastructure goes into core if it crosses two verticals.
+- **Eval harness per vertical.** Each vertical ships an `eval` script that exercises its prompts
+  against multiple host LLMs (anthropic / openai / openrouter / ollama / lmstudio) and writes
+  per-field accuracy reports to `benchmarks/`. This is how we keep the "works with your model"
+  claim honest.
+
 ## Active
 
 | # | Idea | Source | Status |

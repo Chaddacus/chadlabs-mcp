@@ -2,6 +2,24 @@
 
 Idea: autonomous marketing/sales agent with privacy.com card access, budget caps, attribution, channel allocation. Surfaces because the rate-limiter we identified in Phase 1 is **distribution**, not build.
 
+## Architectural commitment (applies before any code)
+
+The marketer agent follows the same host-LLM principle as the rest of ChadLabs: the agent
+runtime makes ZERO outbound LLM calls. It exposes tools (treasury, channel adapters,
+attribution) and prompts (ad copy, landing variants, allocation rationale). The host that
+drives it — Claude Code / Codex / Goose, running on Chad's box — does the inference. This means:
+
+- Treasury, attribution, and channel adapters are deterministic services with audit logs;
+  they never depend on a particular model behaving a particular way.
+- Creative generation is a Prompt (host LLM renders copy) plus a Tool (records the chosen
+  variant + outcome). If the model is bad at copy this week, swap hosts; tools and budget
+  caps don't change.
+- Kill switches and budget caps are enforced in the Tool layer, not in the prompt — a model
+  hallucinating "I should spend $5,000 on Reddit Ads" never reaches the privacy.com API
+  because the Tool refuses anything above the configured cap.
+
+When this gets productized (Shape C), the same separation lets buyers bring their own LLM.
+
 ## Three shapes
 
 | Shape | What | Verdict |
