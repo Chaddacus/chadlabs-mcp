@@ -7,10 +7,10 @@
   "homepage": "https://bookkeeping.chadacus.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chadsimon/chadlabs-mcp.git",
+    "url": "https://github.com/Chaddacus/chadlabs-mcp.git",
     "directory": "packages/bookkeeping"
   },
-  "bugs": "https://github.com/chadsimon/chadlabs-mcp/issues",
+  "bugs": "https://github.com/Chaddacus/chadlabs-mcp/issues",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -41,14 +41,14 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "serve": "tsx bin/cli.ts serve",
     "doctor": "tsx bin/cli.ts doctor",
-    "bench": "tsx bin/bench.ts --render-only",
     "eval": "tsx bin/eval.ts",
-    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build"
+    "smoke:network": "tsx scripts/network_smoke.ts",
+    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm smoke:network && pnpm build"
   },
   "dependencies": {
     "@chadlabs/core": "workspace:*",

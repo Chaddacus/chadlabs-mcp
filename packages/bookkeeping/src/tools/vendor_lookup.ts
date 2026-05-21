@@ -1,6 +1,6 @@
 import { z } from "zod";
 import Database from "better-sqlite3";
-import type { Tool } from "../__core_shim__.js";
+import type { Tool } from "@chadlabs/core";
 import { getDb } from "../db/connection.js";
 
 export const VendorLookupInputSchema = z.object({

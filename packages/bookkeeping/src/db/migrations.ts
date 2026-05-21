@@ -1,4 +1,4 @@
-import type { Migration } from "../__core_shim__.js";
+import type { Migration } from "@chadlabs/core";
 
 export const migrations: Migration[] = [
   {

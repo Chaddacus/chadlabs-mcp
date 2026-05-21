@@ -112,7 +112,7 @@ Migrations are idempotent. Existing data is preserved.
 
 Some MCP hosts only support tools (not prompts/resources). In that case, you can:
 
-- Ask the host to show you the prompt source (`pnpm --filter @chadlabs/bookkeeping bench` renders them to stdout), then paste manually.
+- Read the prompt source directly from `packages/bookkeeping/src/prompts/{invoice_extract,txn_classify,chase_draft}.ts` and paste the system text manually into the host.
 - Or use a host that supports the full MCP spec (Claude Desktop, Goose, Cursor recent builds).
 
 Tools (`vendor_lookup`, `vendor_remember`, `chase_log_record`) work in any MCP host.

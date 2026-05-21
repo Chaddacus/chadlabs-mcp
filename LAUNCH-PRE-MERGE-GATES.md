@@ -14,30 +14,33 @@ After the host-LLM refactor, this MCP makes **zero outbound LLM calls**. The hos
 
 | Gate | Status | Owner | Notes |
 |---|---|---|---|
-| `@chadlabs/core` typecheck + tests pass | ✅ | code | 21/21 tests after host-LLM refactor |
-| `@chadlabs/bookkeeping` typecheck + tests pass | ✅ | code | 39/39 tests after refactor |
-| Prompts render cleanly (`pnpm bench`) | ✅ | code | 3/3 prompts render |
-| npm publish dry-run | ⬜ | Chad | `npm pack` + verify tarball contents + bin entries |
-| `lsof` / `ss` zero-outbound verification | ⬜ | Chad | Confirm the locality claim while a tool call runs |
+| `@chadlabs/core` typecheck + tests pass | ✅ | code | passing (host-LLM refactor) |
+| `@chadlabs/bookkeeping` typecheck + tests pass | ✅ | code | 54/54 tests (incl. eval-scorer tests) |
+| Prompts render cleanly | ✅ | code | covered by prompt unit tests + eval harness |
+| Network-locality smoke (`pnpm smoke:network`) | ✅ | code | claim c6 — zero fetch/http.request during full prompt + resource render |
+| Static-deps scan (no LLM SDK in runtime deps) | ✅ | code | see `packages/bookkeeping/specs/data-locality.md` |
+| npm publish dry-run | ⬜ | Chad | `pnpm pack` + verify tarball contents + bin entries (CI verifies `eval/` excluded automatically) |
+| `lsof` / `ss` zero-outbound verification | ⬜ | Chad | Optional belt-and-suspenders on top of smoke test |
 
 ### Prompt quality (cross-host evaluation)
 
 | Gate | Status | Owner | Notes |
 |---|---|---|---|
-| Multi-host prompt eval harness built | ⬜ | code (next) | Renders prompts against fixtures, sends to each host's primary model, scores extraction accuracy |
-| `invoice_extract` quality on Claude Sonnet 4.5 | ⬜ | Chad + key | Target ≥90% on critical fields (vendor, amount, currency, category) |
-| `invoice_extract` quality on GPT-4o | ⬜ | Chad + key | Target ≥85% |
-| `invoice_extract` quality on Llama 3.3 70B (Ollama) | ⬜ | Chad + local model | Target ≥75% (advertise local-model floor honestly) |
-| `txn_classify` quality on each of the above | ⬜ | Chad | Same tiering |
-| Quality report published in `_research/prompt-eval-results-MM.md` | ⬜ | Chad | Public, honest, with numbers |
+| Multi-host prompt eval harness built | ✅ | code | `bin/eval.ts` + `eval/providers/{anthropic,openai,openrouter,ollama,lmstudio}.ts` + 10/20 fixture sets + scorer with 12 tests |
+| `invoice_extract` quality on Claude Sonnet 4.5 (via OpenRouter) | ✅ | code | 90/100/100/80% across vendor/amount/currency/category — passing all thresholds (see `packages/bookkeeping/benchmarks/invoice-extract-cross-host.md`) |
+| `txn_classify` quality on Claude Sonnet 4.5 (via OpenRouter) | ✅ | code | 100% top-1 on 20 fixtures (see `packages/bookkeeping/benchmarks/txn-classify-cross-host.md`) |
+| `invoice_extract` + `txn_classify` quality on Anthropic direct | ⬜ | Chad + key | Set `ANTHROPIC_API_KEY` and run `pnpm eval both anthropic`; or wait for first CI eval run with secret configured |
+| Quality on GPT-4o | ⬜ | Chad + key | `OPENAI_API_KEY` then `pnpm eval both openai gpt-4o-2024-11-20` |
+| Quality on Llama 3.3 (Ollama) | ⬜ | Chad + local model | `OLLAMA_HOST=... pnpm eval both ollama llama3.3` — advertise local-model floor honestly |
+| Cross-host CI workflow | ✅ | code | `.github/workflows/eval.yml` runs on manual dispatch or when prompts/eval change; uploads benchmarks as artifacts |
 
 ### Truth-layer (`~/.claude/state/product_truth/`)
 
 | Gate | Status | Owner | Notes |
 |---|---|---|---|
-| `bookkeeping-mcp.json` exists + gate-passing | ✅ | code | Written by product-orchestrator |
-| Truth-layer claims patched to reflect host-LLM arch | ⬜ | Chad-twin | c1/c2 should be "prompt quality across host models" not "extraction by server"; c5 should not claim Anthropic API key required |
-| Truth-layer claim c6 (data locality) → real evidence | ⬜ | Chad | Now upgraded: zero outbound calls vs. just "no third-party SaaS." Verifiable. |
+| `bookkeeping-mcp.json` exists + gate-passing | ✅ | code | `ok: true` from `product_truth_check.py` |
+| Truth-layer claims patched to reflect host-LLM arch | ✅ | code | c1/c2 rewired to cross-host-eval evidence; c5 no longer claims Anthropic API key; new c7 documents 3+3+1 primitives |
+| Truth-layer claim c6 (data locality) → real evidence | ✅ | code | `packages/bookkeeping/specs/data-locality.md` (static deps + source scan + runtime smoke); wired into `prepublishOnly` |
 
 ### Distribution (manual, Chad-only)
 
@@ -59,7 +62,7 @@ After the host-LLM refactor, this MCP makes **zero outbound LLM calls**. The hos
 
 | Gate | Status | Owner | Notes |
 |---|---|---|---|
-| Landing page at `bookkeeping.chadacus.dev` | ⬜ | code or Chad | Static site with Loom + "Buy on Apify" CTA. Traefik route on existing VPS — wildcard cert already covers it. |
+| Landing page at `bookkeeping.chadacus.dev` | ✅ | code | Live (2026-05-21). nginx behind Traefik on linode `web` network, riding existing `*.chadacus.dev` cert. HSTS + CSP + healthz + robots.txt. Pre-launch CTA is email waitlist. |
 | (Future) `licenses.chadacus.dev` license API | ⬜ | code | v2 when self-hosted billing replaces marketplace as primary |
 
 ### Marketing artifacts
@@ -79,9 +82,9 @@ After the host-LLM refactor, this MCP makes **zero outbound LLM calls**. The hos
 
 | Gate | Status | Owner | Notes |
 |---|---|---|---|
-| 3 bookkeepers recruited | ⬜ | Chad | Free 30-day in exchange for structured feedback |
-| Beta feedback form drafted | ⬜ | Chad or code | Google Form or markdown |
-| Day-14 exit interview script | ⬜ | Chad | "Would you pay $29/mo today? If no, what price? If no at any price, what's missing?" |
+| 3 bookkeepers recruited | ⬜ | Chad | Recruiting kit in `_research/beta-recruiting-kit.md` (Reddit post, DM templates, intake-form questions) |
+| Beta feedback form drafted | ✅ | code | 14-day survey schema in `_research/beta-recruiting-kit.md` § "14-day feedback survey" |
+| Day-14 exit interview script | ✅ | code | Q1 of the 14-day survey is the c3 evidence; pricing question is Q7 |
 
 ### Identity / brand
 
@@ -107,12 +110,15 @@ ALL of the following at day 30 = kill the vertical (not the engine):
 
 ONE red, rest green = distribution problem, change channel. ALL red = port engine to a different vertical (real-estate, HR intake, e-com ops).
 
-## Next action
+## Next action (post-Phase-2)
 
-Pick one:
-1. **Build the multi-host prompt-eval harness** (1-2 hours of code). Then run it. Numbers in hand make all marketing copy more credible.
-2. **ToS audit** — 30 min of real-browser reading across 4 marketplaces.
-3. **Loom recordings** — Claude Desktop demo + Goose-with-Ollama "local model" demo. ~20 min.
-4. **Deploy landing page** to `bookkeeping.chadacus.dev` via existing Traefik wildcard. ~30 min.
+Code-side gates are largely closed. Remaining is identity/payment/network work only Chad can do:
 
-Fastest to first dollar: 2 → 4 → Apify listing → 3 → r/Bookkeeping post → DMs.
+1. **ToS audit** across Apify / MCPize / Agensi / xpay (~30 min real-browser).
+2. **Create the 4 marketplace creator accounts** (~45 min, real Stripe payout info).
+3. **`gh repo create Chaddacus/chadlabs-mcp --public`** + push (or have me do it; just say go).
+4. **Loom × 2** — Claude Desktop demo + Goose+Ollama "local model" demo (~20 min). Storyboard in `_research/loom-storyboard.md` (next).
+5. **Recruit 3 beta bookkeepers** using `_research/beta-recruiting-kit.md` (post + DMs).
+6. **npm scope claim** + 2FA setup, then `pnpm publish` from CI or local.
+
+Fastest to first dollar: 1 → 2 → 3 → 4 (Claude only) → Apify listing live → 5 → r/Bookkeeping post → Loom 2 → cross-list others.

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
-import type { Tool } from "../__core_shim__.js";
+import type { Tool } from "@chadlabs/core";
 import { getDb } from "../db/connection.js";
 
 export const ChaseLogRecordInputSchema = z.object({

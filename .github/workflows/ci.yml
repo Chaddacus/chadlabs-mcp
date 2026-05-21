@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r typecheck
+      - run: pnpm -r test
+      - name: Network locality smoke (claim c6)
+        run: pnpm --filter @chadlabs/bookkeeping smoke:network
+      - name: Build packages
+        run: pnpm -r build
+      - name: Verify published tarball excludes eval/ and providers/
+        run: |
+          cd packages/bookkeeping
+          pnpm pack
+          if tar -tzf chadlabs-bookkeeping-*.tgz | grep -E '(^|/)eval/|providers/' ; then
+            echo "FAIL: eval/ or providers/ leaked into the publishable tarball"
+            exit 1
+          fi
+          echo "OK: tarball excludes eval/ and providers/"

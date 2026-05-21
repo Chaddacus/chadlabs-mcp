@@ -105,10 +105,10 @@
   </p>
 
   <div class="cta-row">
-    <a class="cta primary" href="https://apify.com/chadlabs/bookkeeping-mcp">Buy on Apify · $29/mo</a>
-    <a class="cta" href="https://github.com/chadsimon/chadlabs-mcp">View on GitHub</a>
+    <a class="cta primary" href="mailto:chad@chadacus.dev?subject=BookkeepingMCP%20early%20access&body=Hi%20Chad%2C%0A%0AI%27d%20like%20early%20access%20to%20BookkeepingMCP.%0A%0AMy%20bookkeeping%20stack%20today%3A%20%0AMy%20AI%20host%3A%20(Claude%20Desktop%20%2F%20Goose%20%2F%20Cursor%20%2F%20Codex%20%2F%20other)%0A%0AThanks">Join the early-access list</a>
+    <a class="cta" href="#quickstart">Quickstart</a>
   </div>
-  <p class="muted-line">Also listed on MCPize, Agensi, and xpay ($0.29/op).</p>
+  <p class="muted-line">Pre-launch: marketplace listings on Apify / MCPize / Agensi / xpay go live with the v0.1 npm cut. Early-access email gets the npm install command on launch day.</p>
 
   <hr />
 
@@ -163,8 +163,8 @@
 
   <hr />
 
-  <h2>Quickstart</h2>
-  <p>You'll need Node 20+ and any MCP-capable host (Claude Desktop, Goose, etc.).</p>
+  <h2 id="quickstart">Quickstart</h2>
+  <p>You'll need Node 20+ and any MCP-capable host (Claude Desktop, Goose, etc.). On launch day the npm package is one line:</p>
   <pre><code>npx -y @chadlabs/bookkeeping init
 npx -y @chadlabs/bookkeeping doctor</code></pre>
   <p>
@@ -174,7 +174,7 @@ npx -y @chadlabs/bookkeeping doctor</code></pre>
 
   <hr />
 
-  <h2>Pricing</h2>
+  <h2>Pricing (planned at launch)</h2>
   <table>
     <thead>
       <tr><th>Marketplace</th><th>Plan</th><th>You pay</th></tr>
@@ -186,7 +186,7 @@ npx -y @chadlabs/bookkeeping doctor</code></pre>
       <tr><td>xpay</td><td>Usage-based</td><td>$0.29 / operation</td></tr>
     </tbody>
   </table>
-  <p class="muted-line">Marketplace take rates differ; the listed price is what you pay. LLM tokens (Anthropic, OpenAI, etc.) are paid separately to your provider — there's no markup.</p>
+  <p class="muted-line">Pre-launch pricing intent. Marketplace take rates differ; the listed price is what you pay. LLM tokens (Anthropic, OpenAI, etc.) are paid separately to your provider — there's no markup. Early-access list locks in launch pricing.</p>
 
   <hr />
 
@@ -194,16 +194,16 @@ npx -y @chadlabs/bookkeeping doctor</code></pre>
   <p>
     Invoices, transactions, and client info live in a local SQLite database at
     <code>~/.chadlabs/bookkeeping/db.sqlite</code> on your machine. The server has no outbound
-    network calls except the optional once-per-day license validation. See the
-    <a href="https://github.com/chadsimon/chadlabs-mcp/blob/main/packages/bookkeeping/PRIVACY.md">PRIVACY.md</a>
-    in the repo for the full data-flow.
+    network calls except the optional once-per-day license validation. Full data-flow + the
+    static-deps proof (no @anthropic-ai/sdk, no openai, no @google/generative-ai in the package)
+    ship with the v0.1 npm release.
   </p>
 
   <hr />
 
   <footer>
     <p>BookkeepingMCP is part of <a href="https://chadacus.dev">ChadLabs</a> — vertical MCP servers for solo professionals. MIT-licensed core, paid license for marketplace listings.</p>
-    <p>Questions: open an issue on <a href="https://github.com/chadsimon/chadlabs-mcp">GitHub</a>.</p>
+    <p>Questions: <a href="mailto:chad@chadacus.dev">chad@chadacus.dev</a>.</p>
   </footer>
 
 </main>

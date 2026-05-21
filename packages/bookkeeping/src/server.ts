@@ -1,5 +1,5 @@
 import { defineMCPServer } from "@chadlabs/core";
-import type { Tool, Prompt, Resource } from "./__core_shim__.js";
+import type { Tool, Prompt, Resource } from "@chadlabs/core";
 
 import { invoiceExtractPrompt } from "./prompts/invoice_extract.js";
 import { txnClassifyPrompt } from "./prompts/txn_classify.js";

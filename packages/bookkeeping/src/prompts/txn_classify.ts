@@ -1,4 +1,4 @@
-import type { Prompt } from "../__core_shim__.js";
+import type { Prompt } from "@chadlabs/core";
 
 function systemFor(categoriesMarkdown: string | undefined): string {
   const categoriesBlock = categoriesMarkdown

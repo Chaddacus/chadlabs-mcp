@@ -1,4 +1,4 @@
-import type { Prompt } from "../__core_shim__.js";
+import type { Prompt } from "@chadlabs/core";
 
 const SYSTEM = `You are a bookkeeping assistant drafting a polite client-chase email to request missing information about transactions.
 

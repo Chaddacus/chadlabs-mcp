@@ -1,0 +1,58 @@
+name: cross-host eval
+
+# Eval costs real $ on each run, so it's gated behind:
+#   - manual dispatch from the Actions tab
+#   - or schedule (disabled by default)
+#   - or push to main that touches prompts / eval harness
+#
+# Configure provider keys as repo secrets. Only providers with keys present
+# will be exercised.
+on:
+  workflow_dispatch:
+    inputs:
+      providers:
+        description: 'Comma-separated provider IDs or "all"'
+        default: 'all'
+        type: string
+      prompt:
+        description: 'invoice | txn | both'
+        default: 'both'
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - 'packages/bookkeeping/src/prompts/**'
+      - 'packages/bookkeeping/eval/**'
+      - 'packages/bookkeeping/bin/eval.ts'
+      - 'packages/bookkeeping/src/resources/categories.ts'
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build
+      - name: Cross-host eval
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          PROMPT="${{ github.event.inputs.prompt || 'both' }}"
+          PROVIDERS="${{ github.event.inputs.providers || 'all' }}"
+          pnpm --filter @chadlabs/bookkeeping eval "$PROMPT" "$PROVIDERS"
+      - name: Upload benchmark reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-host-eval-${{ github.sha }}
+          path: packages/bookkeeping/benchmarks/*.md
+          retention-days: 90

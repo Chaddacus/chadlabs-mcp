@@ -1,4 +1,4 @@
-import type { Resource } from "../__core_shim__.js";
+import type { Resource } from "@chadlabs/core";
 
 /**
  * Standard small-business chart of accounts.

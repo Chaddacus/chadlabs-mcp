@@ -79,10 +79,11 @@ See [PRIVACY.md](./PRIVACY.md). With a local-model host (Ollama, LM Studio), you
 ## Testing
 
 ```bash
-pnpm --filter @chadlabs/bookkeeping test       # 39 unit tests, no LLM calls
+pnpm --filter @chadlabs/bookkeeping test           # 54 unit tests, no LLM calls
 pnpm --filter @chadlabs/bookkeeping typecheck
 pnpm --filter @chadlabs/bookkeeping build
-pnpm --filter @chadlabs/bookkeeping bench      # prompt render checks
+pnpm --filter @chadlabs/bookkeeping smoke:network  # proof of zero outbound calls (claim c6)
+pnpm --filter @chadlabs/bookkeeping eval both all  # cross-host prompt eval (needs API keys in env)
 ```
 
 ## Architecture decision
