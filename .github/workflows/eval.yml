@@ -1,10 +1,7 @@
 name: cross-host eval
 
-# Eval costs real $ on each run, so it's gated behind:
-#   - manual dispatch from the Actions tab
-#   - or schedule (disabled by default)
-#   - or push to main that touches prompts / eval harness
-#
+# Eval costs real $ on each run, so it's gated behind MANUAL dispatch only.
+# Run from the Actions tab and pick which providers / prompts to exercise.
 # Configure provider keys as repo secrets. Only providers with keys present
 # will be exercised.
 on:
@@ -18,13 +15,6 @@ on:
         description: 'invoice | txn | both'
         default: 'both'
         type: string
-  push:
-    branches: [main]
-    paths:
-      - 'packages/bookkeeping/src/prompts/**'
-      - 'packages/bookkeeping/eval/**'
-      - 'packages/bookkeeping/bin/eval.ts'
-      - 'packages/bookkeeping/src/resources/categories.ts'
 
 jobs:
   eval:
@@ -32,8 +22,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
