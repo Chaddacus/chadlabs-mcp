@@ -1,0 +1,20 @@
+{
+  "name": "chadlabs-mcp",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Vertical MCP servers for solo professionals — shared core + per-vertical packages",
+  "type": "module",
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
