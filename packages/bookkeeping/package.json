@@ -12,8 +12,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "serve": "node ./dist/bin/serve.js",
-    "bench": "CHADLABS_DEV_MODE=1 tsx bin/bench.ts",
-    "bench:real": "CHADLABS_DEV_MODE=1 tsx bin/bench.ts all --real"
+    "bench": "tsx bin/bench.ts --render-only"
   },
   "dependencies": {
     "@chadlabs/core": "workspace:*",

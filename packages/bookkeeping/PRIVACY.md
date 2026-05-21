@@ -1,53 +1,69 @@
 # Privacy — @chadlabs/bookkeeping
 
+## TL;DR
+
+**This MCP server makes zero outbound network calls.** Your bookkeeping data never leaves your machine via us. The only thing that ever sees your data is whatever LLM your host (Claude Desktop / Goose / Cursor / local Ollama) is already connected to — and that's a connection you set up, not us.
+
 ## Where your data lives
 
 All data is local. Specifically:
 
-- **SQLite database:** `~/.chadlabs/bookkeeping/db.sqlite` (your machine, your filesystem, your backups)
-- **Tables stored:** transactions, vendors, categories, chase log
+- **SQLite database:** `~/.chadlabs/bookkeeping/db.sqlite` by default (override with `CHADLABS_BOOKKEEPING_DB`)
+- **Tables:** vendors, chase_log, categories, _migrations
+- No remote server. We don't operate one.
 
-No data leaves your machine to ChadLabs servers. We don't run a server.
+## Outbound network calls from this package
 
-## Network calls
+**Zero.** Verifiable:
 
-The MCP server makes exactly one kind of outbound call: structured-output requests to the Anthropic API at `api.anthropic.com`. These calls contain:
+```bash
+# Run this MCP server with strace (Linux) or DTrace (macOS) connect events watched.
+# You will see no outbound connections except localhost / DNS resolver.
+```
 
-- The system prompt for the specific tool being invoked
-- The text content you pass to the tool (email body, transaction list, client info)
+## Where the LLM actually sees data
 
-That's it. No analytics, no telemetry, no error-reporting service.
+Your host (whatever you use — Claude Desktop, Goose, Cursor, Continue + Ollama, etc.) is the thing that calls an LLM. When you ask it to extract an invoice:
 
-## What Anthropic sees
+1. Host loads our prompt (no outbound from us).
+2. Host loads our categories resource (no outbound from us).
+3. Host calls **its own LLM connection** with the prompt + your email body.
+4. Model returns JSON.
+5. Host hands you the result.
 
-When you use the tool, Anthropic receives the request as part of normal API usage under **your** API key. Their data-handling policy applies (https://www.anthropic.com/legal/privacy). If you've enabled their commercial / no-training tier, they don't train on the request.
+The LLM sees your email body and the prompts. Whether that LLM is local (Ollama, LM Studio) or cloud (Anthropic, OpenAI, Google) is **your host's configuration**, not ours.
 
-## Privileged data (legal / financial)
+## With a local-model host
 
-This MCP is appropriate for handling bookkeeping data including client invoices, transaction memos, and email drafts. Because the data is local + only routed to Anthropic under your API key, it's compatible with most professional confidentiality obligations.
+If your host runs a local model (Ollama, LM Studio, llama.cpp, MLX), **your data never leaves your machine**. Period.
 
-**However:** if you handle data under specific regulatory regimes (HIPAA-covered, attorney-client privileged client data above a certain threshold, etc.), confirm your local rules permit sending the data to a third-party LLM API. ChadLabs doesn't make that determination for you.
+## With a cloud-model host
+
+If your host uses Anthropic, OpenAI, Google, etc., the standard data-handling policy of whichever provider applies. We don't introduce any additional third-party. There is no "ChadLabs Cloud" middleman.
+
+## Privileged data
+
+This MCP is appropriate for bookkeeping data including client invoices, transaction memos, and email drafts. Compatibility with regulatory regimes (HIPAA, attorney-client privilege thresholds, GLBA) depends on **your host's LLM connection**, not us. Confirm your host's provider's terms before processing regulated data.
 
 ## License key
 
-The `CHADLABS_LICENSE_KEY` env var is sent **only** to ChadLabs license verification (when implemented for v2 paid tier). Until then it's stored in Claude Desktop's config and validated locally in dev mode.
+`CHADLABS_LICENSE_KEY` is stored in your host's MCP config and validated locally. The current implementation checks key format only (`CL-...`); paid-key remote verification is a v2 feature. When implemented, license calls will be the **only** outbound network call this package makes, scoped to `licenses.chadacus.dev` (or equivalent) and clearly documented.
 
 ## Logs
 
-The MCP server does not write logs to disk by default. Claude Desktop may log its own MCP traffic for debugging.
+We don't write logs to disk. We don't ship telemetry. We don't operate an error-reporting service.
 
 ## Smoke test
 
-You can verify the locality claim:
-
 ```bash
-# In one terminal:
-sudo tcpdump -i any -nn 'host not api.anthropic.com and not 127.0.0.1' 2>&1 | grep -i bookkeeping
+# macOS:
+sudo lsof -i -P -n -p $(pgrep -f bookkeeping-mcp)
 
-# In another, run a tool call through Claude Desktop.
+# Linux:
+sudo ss -tnp | grep bookkeeping
 ```
 
-If `tcpdump` shows any traffic from the bookkeeping process to a host that's not `api.anthropic.com` (other than localhost / your DNS resolver), file an issue.
+You should see no established outbound connections. If you do, file an issue.
 
 ## Data deletion
 
@@ -55,4 +71,4 @@ If `tcpdump` shows any traffic from the bookkeeping process to a host that's not
 rm -rf ~/.chadlabs/bookkeeping
 ```
 
-Done. No remote state.
+Done. No remote state to clear.

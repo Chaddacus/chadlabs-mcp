@@ -1,12 +1,14 @@
 # Install — @chadlabs/bookkeeping
 
-5-minute setup for Claude Desktop on macOS / Linux / Windows.
+5-minute setup. Works with any MCP host (Claude Desktop, Goose, Cursor, Codex, Continue, custom clients).
 
 ## Prerequisites
 
-- Claude Desktop installed and signed in (https://claude.ai/download)
+- An MCP host already configured with an LLM (your existing setup — Claude Desktop with Claude, Goose with whatever model, Cursor, Continue with Ollama, etc.)
 - Node.js 20 or later (`node --version`)
 - A license key (or dev mode for testing)
+
+**You do NOT need an Anthropic API key.** This MCP makes zero outbound LLM calls. The host you already use does inference.
 
 ## Step 1 — Initialize
 
@@ -14,17 +16,18 @@
 npx @chadlabs/bookkeeping init
 ```
 
-This creates `~/.chadlabs/bookkeeping/db.sqlite` and prints the Claude Desktop config snippet for the next step.
+This creates `~/.chadlabs/bookkeeping/db.sqlite`, runs migrations, and prints the host config snippet for the next step.
 
-## Step 2 — Add to Claude Desktop config
+## Step 2 — Add to your host's MCP config
 
-Open Claude Desktop's config file:
+### Claude Desktop
 
+Config file location:
 - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Linux:** `~/.config/Claude/claude_desktop_config.json`
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
-Add the `bookkeeping` entry under `mcpServers`:
+Add to `mcpServers`:
 
 ```json
 {
@@ -33,7 +36,6 @@ Add the `bookkeeping` entry under `mcpServers`:
       "command": "npx",
       "args": ["@chadlabs/bookkeeping", "serve"],
       "env": {
-        "ANTHROPIC_API_KEY": "sk-ant-...",
         "CHADLABS_LICENSE_KEY": "CL-XXXX-XXXX"
       }
     }
@@ -41,36 +43,62 @@ Add the `bookkeeping` entry under `mcpServers`:
 }
 ```
 
-Dev mode (free, full features, no license check):
+Dev mode (free, no license check):
 
 ```json
-"env": {
-  "ANTHROPIC_API_KEY": "sk-ant-...",
-  "CHADLABS_DEV_MODE": "1"
-}
+"env": { "CHADLABS_DEV_MODE": "1" }
 ```
 
-## Step 3 — Restart Claude Desktop
+### Goose
 
-Quit and relaunch. Claude will pick up the new MCP server on startup.
+Add to `~/.config/goose/config.yaml`:
+
+```yaml
+extensions:
+  bookkeeping:
+    type: stdio
+    cmd: npx
+    args: ["@chadlabs/bookkeeping", "serve"]
+    env:
+      CHADLABS_LICENSE_KEY: "CL-XXXX-XXXX"
+```
+
+### Cursor / Continue / Codex
+
+Use your host's standard MCP server registration. The command is always:
+
+```
+npx @chadlabs/bookkeeping serve
+```
+
+## Step 3 — Restart your host
+
+Quit and relaunch (Claude Desktop, Goose, Cursor, whatever).
 
 ## Step 4 — Verify
 
-In a Claude conversation, type:
+In a conversation with your host, ask it to use the `invoice_extract` prompt on a pasted invoice email:
 
-> Use the `invoice_extract` tool to pull invoice details from this email: [paste an invoice email body here]
+> Load the `invoice_extract` prompt and the `bookkeeping://categories` resource, then run it against this email: [paste an invoice]
 
-Claude should call the tool and return a 12-field structured JSON.
+The host should:
+1. Load the prompt (system + JSON schema).
+2. Load the categories resource (chart of accounts).
+3. Call its own LLM with your email body.
+4. Return 12-field structured invoice JSON.
+
+If the host doesn't natively load prompts/resources, you can also call them inline:
+> Show me the `invoice_extract` prompt from bookkeeping, then apply it to this email: [...]
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
 | "License check failed: missing" | Set `CHADLABS_LICENSE_KEY` or `CHADLABS_DEV_MODE=1` in the env block |
-| "Cannot find module @chadlabs/bookkeeping" | Run `npx -y @chadlabs/bookkeeping init` first to install |
-| Tool list doesn't show bookkeeping tools | Confirm Claude Desktop is fully quit (not just window-closed) and restarted |
-| Anthropic API errors | Verify `ANTHROPIC_API_KEY` is set in the env block, not just your shell |
+| "Cannot find module @chadlabs/bookkeeping" | Run `npx -y @chadlabs/bookkeeping init` first |
+| Tool/prompt list doesn't show bookkeeping entries | Confirm the host is fully restarted (not just window-closed) |
 | Database errors | `rm -rf ~/.chadlabs/bookkeeping && npx @chadlabs/bookkeeping init` |
+| Custom DB path | `CHADLABS_BOOKKEEPING_DB=/path/to/file.sqlite` in the env block |
 
 ## Update
 
@@ -78,4 +106,13 @@ Claude should call the tool and return a 12-field structured JSON.
 npx @chadlabs/bookkeeping@latest init
 ```
 
-Re-running `init` against an existing DB is a no-op for the schema (migrations are idempotent).
+Migrations are idempotent. Existing data is preserved.
+
+## What if my host doesn't support MCP prompts/resources?
+
+Some MCP hosts only support tools (not prompts/resources). In that case, you can:
+
+- Ask the host to show you the prompt source (`pnpm --filter @chadlabs/bookkeeping bench` renders them to stdout), then paste manually.
+- Or use a host that supports the full MCP spec (Claude Desktop, Goose, Cursor recent builds).
+
+Tools (`vendor_lookup`, `vendor_remember`, `chase_log_record`) work in any MCP host.

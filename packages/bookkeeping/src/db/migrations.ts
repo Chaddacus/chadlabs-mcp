@@ -49,9 +49,12 @@ export const migrations: Migration[] = [
     version: 4,
     name: "create_chase_log",
     sql: `
+      -- transaction_id is an external reference (transactions live in the
+      -- host LLM's context / the bookkeeper's PMS — not necessarily in our
+      -- local transactions table), so it is NOT a foreign key.
       CREATE TABLE IF NOT EXISTS chase_log (
         id             TEXT PRIMARY KEY,
-        transaction_id TEXT REFERENCES transactions(id),
+        transaction_id TEXT NOT NULL,
         client_email   TEXT NOT NULL,
         draft_subject  TEXT NOT NULL,
         draft_body     TEXT NOT NULL,

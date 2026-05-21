@@ -1,27 +1,39 @@
-export { serve, tools } from "./server.js";
+export { serve, tools, prompts, resources } from "./server.js";
 
 export {
-  invoiceExtractTool,
-  InvoiceExtractInputSchema,
-  InvoiceExtractOutputSchema,
-  type InvoiceExtractInput,
-  type InvoiceExtractOutput,
-} from "./tools/invoice_extract.js";
+  invoiceExtractPrompt,
+  INVOICE_EXTRACT_SYSTEM,
+} from "./prompts/invoice_extract.js";
+export {
+  txnClassifyPrompt,
+  TXN_CLASSIFY_SYSTEM,
+} from "./prompts/txn_classify.js";
+export {
+  chaseDraftPrompt,
+  CHASE_DRAFT_SYSTEM,
+} from "./prompts/chase_draft.js";
+
+export { categoriesResource, CATEGORIES } from "./resources/categories.js";
 
 export {
-  txnClassifyTool,
-  TxnClassifyInputSchema,
-  TxnClassifyOutputSchema,
-  type TxnClassifyInput,
-  type TxnClassifyOutput,
-} from "./tools/txn_classify.js";
+  vendorLookupTool,
+  VendorLookupInputSchema,
+  lookupVendors,
+  type VendorLookupInput,
+  type VendorMatch,
+} from "./tools/vendor_lookup.js";
 
 export {
-  chaseDraftTool,
-  ChaseDraftInputSchema,
-  ChaseDraftOutputSchema,
-  type ChaseDraftInput,
-  type ChaseDraftOutput,
-} from "./tools/chase_draft.js";
+  vendorRememberTool,
+  VendorRememberInputSchema,
+  type VendorRememberInput,
+} from "./tools/vendor_remember.js";
+
+export {
+  chaseLogRecordTool,
+  ChaseLogRecordInputSchema,
+  type ChaseLogRecordInput,
+} from "./tools/chase_log_record.js";
 
 export { migrations } from "./db/migrations.js";
+export { defaultDbPath, getDb, _setDbForTesting, _resetDb } from "./db/connection.js";

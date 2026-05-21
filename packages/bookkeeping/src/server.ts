@@ -1,21 +1,38 @@
 import { defineMCPServer } from "@chadlabs/core";
-import type { Tool } from "./__core_shim__.js";
-import { invoiceExtractTool } from "./tools/invoice_extract.js";
-import { txnClassifyTool } from "./tools/txn_classify.js";
-import { chaseDraftTool } from "./tools/chase_draft.js";
+import type { Tool, Prompt, Resource } from "./__core_shim__.js";
 
-// Tools are invariant in their input-type generic; coerce to Tool<unknown> at
-// the boundary so defineMCPServer accepts the heterogeneous array.
+import { invoiceExtractPrompt } from "./prompts/invoice_extract.js";
+import { txnClassifyPrompt } from "./prompts/txn_classify.js";
+import { chaseDraftPrompt } from "./prompts/chase_draft.js";
+
+import { categoriesResource } from "./resources/categories.js";
+
+import { vendorLookupTool } from "./tools/vendor_lookup.js";
+import { vendorRememberTool } from "./tools/vendor_remember.js";
+import { chaseLogRecordTool } from "./tools/chase_log_record.js";
+
+// Tools are invariant in their input-type generic; coerce at the boundary so
+// defineMCPServer accepts the heterogeneous array.
 export const tools: Tool[] = [
-  invoiceExtractTool as unknown as Tool,
-  txnClassifyTool as unknown as Tool,
-  chaseDraftTool as unknown as Tool,
+  vendorLookupTool as unknown as Tool,
+  vendorRememberTool as unknown as Tool,
+  chaseLogRecordTool as unknown as Tool,
 ];
+
+export const prompts: Prompt[] = [
+  invoiceExtractPrompt,
+  txnClassifyPrompt,
+  chaseDraftPrompt,
+];
+
+export const resources: Resource[] = [categoriesResource];
 
 const server = defineMCPServer({
   name: "bookkeeping-mcp",
   version: "0.0.0",
   tools,
+  prompts,
+  resources,
 });
 
 export function serve(): Promise<void> {
