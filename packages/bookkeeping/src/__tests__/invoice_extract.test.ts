@@ -89,7 +89,7 @@ describe("invoice_extract tool", () => {
     }
   );
 
-  it("all 5 fixtures return valid output", async () => {
+  it("all fixtures return valid output", async () => {
     const results = await Promise.all(
       invoiceFixtures.map((f) =>
         invoiceExtractTool.handler({
@@ -99,7 +99,7 @@ describe("invoice_extract tool", () => {
         })
       )
     );
-    expect(results).toHaveLength(5);
+    expect(results).toHaveLength(invoiceFixtures.length);
     for (const r of results) {
       const data = unwrap<InvoiceExtractOutput>(r);
       const parsed = InvoiceExtractOutputSchema.safeParse(data);

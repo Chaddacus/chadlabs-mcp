@@ -79,7 +79,7 @@ describe("txn_classify tool", () => {
     expect(result.success).toBe(false);
   });
 
-  it("classifies all 20 fixtures", async () => {
+  it("classifies all fixtures", async () => {
     const envelope = await txnClassifyTool.handler({
       transactions: transactionFixtures.map(({ id, date, amount, description }) => ({
         id,
@@ -89,7 +89,7 @@ describe("txn_classify tool", () => {
       })),
     });
     const parsed = TxnClassifyOutputSchema.parse(unwrap<TxnClassifyOutput>(envelope));
-    expect(parsed.classifications).toHaveLength(20);
+    expect(parsed.classifications).toHaveLength(transactionFixtures.length);
   });
 
   it("all classification fields are well-formed", async () => {
