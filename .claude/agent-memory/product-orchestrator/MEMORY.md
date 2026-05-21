@@ -1,0 +1,1 @@
+- [BookkeepingMCP v1 project](project_bookkeeping_mcp.md) — truth layer scaffolded 2026-05-21; 6 proof gaps (benchmarks/beta/listings/spec); gate ok=true
